@@ -9,6 +9,8 @@ var BURGER_TIME = 5; //ticks between cheezburgerz
 var UNICORN_SPEED = 2;
 var UNICORN_DIFF = 250;
 
+var TICKER_ADD= 500;
+
 var assets, loader;
 var stage;
 var w, h, vy = 0, ay = 0;
@@ -153,8 +155,8 @@ function unicornAttack(){
 }
 
 function hitTest(a){
-	if((a.x - UNICORN_W) == (grumpyCat.x + CAT_W)){
-		// if (a.y >= grumpyCat.y  && (a.y - UNICORN_H) <= (grumpyCat.y+ CAT_H))
+	if(a.x == (grumpyCat.x + CAT_W)){
+
 			console.log("hit");
 	}
 
@@ -190,6 +192,10 @@ function tick(event) {
     if ((tickIndex % UNICORN_DIFF) == 0){
 
     	unicornAttack();
+
+    	// if((tickIndex % TICKER_ADD == 0){
+    	// 	UNICORN_DIFF = (UNICORN_DIFF*2);
+    	// }
     }
     
     for(i=0; i<= unicornArray.length-1; i++){
