@@ -46,16 +46,40 @@ function handleComplete() {
 		var id = item.id;
 		var result = loader.getResult(id);
 
-		if (item.type == createjs.LoadQueue.IMAGE) {
-			var bmp = new createjs.Bitmap(result);
+		switch(id){
+			case "grumpyCat":
+				grumpyCat = new createjs.Bitmap(result);
+				grumpyCat.x= 200;
+				stage.addChild(grumpyCat);
+				break;
+			case "unicorn":
+				unicorn = new createjs.Bitmap(result);
+				unicorn.x = 700;
+				stage.addChild(unicorn);
+				break;
+			case "cheezburger":
+				cheezburger = new createjs.Bitmap(result);
+				cheezburger.x = 400;
+				cheezburger.y = 50;
+				stage.addChild(cheezburger);
+			case "buildings":
+				buildings = new createjs.Bitmap(result);
+				buildings.x = 500;
+				stage.addChild(buildings);
 		}
+		
+			
+	
 	}
 
-	var grumpyCat = loader.getResult("grumpyCat");
-	stage.addChild(grumpyCat);
+
+	// grumpyCat = loader.getResult("grumpyCat");
+	// stage.addChild(grumpyCat);
+
+	stage.update();
 
 	// createjs.Ticker.setFPS(30);
-	// createjs.Ticker.addEventListener("tick",tick);
+	// createjs.Ticker.addEventListener("tick", tick);
 }
 
 // function tick(event) {
