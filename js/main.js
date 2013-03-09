@@ -2,7 +2,7 @@
 var assets;
 var stage;
 var w, h;
-var building, cheezburger,grumpyCat,lazer,unicorn;
+var building, cheezburger, grumpyCat, lazer, unicorn, sky;
 
 
 function init() {
@@ -17,13 +17,13 @@ function init() {
 	stage = new createjs.Stage(canvas);
 
 	manifest = [
-		            {src:"img/buildings.png", id:"buildings"},
-		            {src:"img/cheezburger.png", id:"cheezburger"},
-		            {src:"img/grumpyCat.png", id:"grumpyCat"},
-		            {src:"img/lazer.png", id:"lazer"},
-		            {src:"img/unicorn.png", id:"unicorn"}
-		            //{src:"wall.mp3|wall.ogg", id:"wall"}
-		        ];
+        {src:"img/buildings.png", id:"buildings"},
+        {src:"img/cheezburger.png", id:"cheezburger"},
+        {src:"img/grumpyCat.png", id:"grumpyCat"},
+        {src:"img/lazer.png", id:"lazer"},
+        {src:"img/unicorn.png", id:"unicorn"},
+        {src:"img/sky.png", id:"sky"}
+    ];
 
     assets = []; //gets populated on load
 
@@ -32,8 +32,7 @@ function init() {
     loader.onComplete = handleComplete;
     loader.loadManifest(manifest);
     stage.autoClear = false;
-
-}	       
+}
 
 function handleFileLoad(event) {
 	assets.push(event.item);
@@ -47,6 +46,9 @@ function handleComplete() {
 		var result = loader.getResult(id);
 
 		switch(id){
+			case "sky":
+				sky = new createjs.Shape(new createjs.Graphics().beginBitmapFill(result).drawRect(0,0,w,h));
+				break;
 			case "grumpyCat":
 				grumpyCat = new createjs.Bitmap(result);
 				grumpyCat.x= 200;
@@ -62,28 +64,25 @@ function handleComplete() {
 				cheezburger.x = 400;
 				cheezburger.y = 50;
 				stage.addChild(cheezburger);
+				break;
 			case "buildings":
-				buildings = new createjs.Bitmap(result);
+				// buildings = new createjs.Bitmap(result);
+				buildings = new createjs.Shape(new createjs.Graphics().beginBitmapFill(result).drawRect(0,0,100,200));
 				buildings.x = 500;
-				stage.addChild(buildings);
+				buildings.y = h - 200;
+				break;
 		}
-		
-			
-	
 	}
-
-
-	// grumpyCat = loader.getResult("grumpyCat");
-	// stage.addChild(grumpyCat);
-
-	stage.update();
-
-	// createjs.Ticker.setFPS(30);
-	// createjs.Ticker.addEventListener("tick", tick);
+	//stage.update();
+	stage.addChild(sky, buildings, grumpyCat);
+	createjs.Ticker.setFPS(60);
+	createjs.Ticker.addEventListener("tick", tick);
 }
 
-// function tick(event) {
-
-// 	stage.update(event);
-// }
+function tick(event) {
+	var outside = w + 15;
+	buildings.x = (buildings.x - 1.8);
+	if(buildings.x + 103 <= 0) {buildings.x = outside;}
+	stage.update(event);
+}
 
