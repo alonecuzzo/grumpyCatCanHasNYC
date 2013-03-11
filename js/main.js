@@ -160,6 +160,13 @@ function tick(event) {
     document.onkeyup = handleKeyUp;
     vy += ay;
     grumpyCat.y += vy;
+    //force him on screen
+    if(grumpyCat.y >= (h - CAT_H)){
+		grumpyCat.y = h - CAT_H;
+    }
+    if(grumpyCat.y <= 0) {
+		grumpyCat.y = 0;
+    }
 
     //handle burger firing 
     var i;
