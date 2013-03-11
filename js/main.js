@@ -174,7 +174,6 @@ function tick(event) {
 			for(j=0; j<=unicornArray.length-1; j++) {
 				var pt = burgerArray[i].localToLocal(0, 0, unicornArray[j]);
 				if(unicornArray[j].hitTest(pt.x, pt.y)) {
-					console.log('got a hit');
 					stage.removeChild(unicornArray[j]);
 					unicornArray.splice(j, 1);
 				}
