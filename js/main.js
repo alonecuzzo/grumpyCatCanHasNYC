@@ -1,31 +1,46 @@
 //our game business
-var KEYCODE_UP = 38;
-var KEYCODE_DOWN = 40;
-var KEYCODE_SPACE = 32;
 
-var BURGER_SPEED = 17; //how fast cheezburgerz move
-var BURGER_TIME = 5; //ticks between cheezburgerz
+//constants
+var KEYCODE_UP    = 38,
+	KEYCODE_DOWN  = 40,
+	KEYCODE_SPACE = 32,
+	//size constants
+	UNICORN_W     = 150,
+	UNICORN_H     = 141,
+	CAT_W         = 138,
+	CAT_H         = 83,
+	//speed constants
+	BURGER_SPEED  = 17, //how fast cheezburgerz move
+	BURGER_TIME   = 5,  //ticks between cheezburgerz
+	UNICORN_SPEED = 2,
+	UNICORN_DIFF  = 250;
 
-var UNICORN_SPEED = 2;
-var UNICORN_DIFF = 250;
+//booleans
+var isGCAlive,
+	isUpHeld      = false,
+	isDownHeld    = false,
+	isFireHeld    = false;
 
-var assets, loader;
-var stage;
-var w, h, vy = 0, ay = 0;
-var building, cheezburger, grumpyCat, lazer, unicorn, sky;
+//assets
+var assets,
+	loader,
+	building,
+	cheezburger,
+	grumpyCat,
+	lazer,
+	unicorn,
+	sky,
+	stage;
 
-var upheld = dwheld = fireheld = false;
+//variables
+var tickIndex    = 0,
+	burgerArray  = [],
+	unicornArray = [],
+	w,
+	h,
+	vy           = 0,
+	ay           = 0;
 
-var alive; //is grumpyCat alive?
-var burgerArray = [];
-var unicornArray = [];
-var tickIndex = 0;
-
-var CAT_W = 138;
-var CAT_H = 83;
-
-var UNICORN_W = 150;
-var UNICORN_H = 141;
 
 function init() {
 
@@ -153,13 +168,12 @@ function unicornAttack(){
 }
 
 function hitTest(a){
-	if((a.x - UNICORN_W) == (grumpyCat.x + CAT_W)){
-		// if (a.y >= grumpyCat.y  && (a.y - UNICORN_H) <= (grumpyCat.y+ CAT_H))
-			console.log("hit");
-	}
-
-
-
+	// for(var i = 0; i <= burgerArray.length - 1; i++) {
+	// 	for(var j = 0; j <= unicornArray.length - 1; j++) {		
+	// 		var pt = burgerArray[i].localToLocal(burgerArray[i].x, burgerArray[i].y, unicornArray[j]);
+	// 		if (unicornArray[j].hitTest(pt.x, pt.y)) { console.log('lolz'); }
+	// 	}
+	// }
 }
 
 function tick(event) {
@@ -188,7 +202,6 @@ function tick(event) {
     }
     
     if ((tickIndex % UNICORN_DIFF) == 0){
-
     	unicornAttack();
     }
     
