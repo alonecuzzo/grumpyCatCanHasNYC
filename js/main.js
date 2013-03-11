@@ -132,7 +132,7 @@ function fireCheezburger() { //138X83
 // 	return o.x < bounds*-2 || o.y < bounds*-2 || o.x > canvas.width+bounds*2 || o.y > canvas.height+bounds*2;
 // }
 
-function unicornAttack(){
+function unicornAttack() {
 	var u = new createjs.Bitmap(loader.getResult("unicorn"));
 	u.x   = w - 20;
 	u.y   = Math.random() * h;
@@ -140,7 +140,7 @@ function unicornAttack(){
 	stage.addChild(u);
 }
 
-function hitTest(a){
+function hitTest(a) {
 	// for(var i = 0; i <= burgerArray.length - 1; i++) {
 	// 	for(var j = 0; j <= unicornArray.length - 1; j++) {		
 	// 		var pt = burgerArray[i].localToLocal(burgerArray[i].x, burgerArray[i].y, unicornArray[j]);
@@ -168,6 +168,17 @@ function tick(event) {
 		if(burgerArray[i].x >= w + 10) {
 			stage.removeChild(burgerArray[i]);
 			burgerArray.splice(i, 1);
+		} else {
+			//check and see if the burger has hit anything
+			var j;
+			for(j=0; j<=unicornArray.length-1; j++) {
+				var pt = burgerArray[i].localToLocal(0, 0, unicornArray[j]);
+				if(unicornArray[j].hitTest(pt.x, pt.y)) {
+					console.log('got a hit');
+					stage.removeChild(unicornArray[j]);
+					unicornArray.splice(j, 1);
+				}
+			}
 		}
     }
 
