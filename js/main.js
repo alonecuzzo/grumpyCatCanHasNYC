@@ -40,7 +40,6 @@ var tickIndex    = 0,
 	vy           = 0,
 	ay           = 0;
 
-
 function init() {
 	var canvas = document.getElementById("testCanvas");
 	w          = canvas.width;
