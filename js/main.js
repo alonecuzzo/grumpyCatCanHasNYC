@@ -69,6 +69,10 @@ function init() {
     scoreText.textAlign = "right";
     scoreText.x = w - 25;
     scoreText.y = 20;
+
+    //grumpyMoves & fires
+	document.onkeydown = handleKeyDown;
+    document.onkeyup = handleKeyUp;
 }
 
 function handleFileLoad(event) {
@@ -159,9 +163,7 @@ function tick(event) {
 	buildings.x = (buildings.x - 1.8);
 	if(buildings.x + 103 <= 0) { buildings.x = outside; }
 
-	//grumpyMoves & fires
-	document.onkeydown = handleKeyDown;
-    document.onkeyup = handleKeyUp;
+	
     vy += ay;
     grumpyCat.y += vy;
     //force him on screen
