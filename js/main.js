@@ -15,7 +15,8 @@ var KEYCODE_UP         = 38,
 	UNICORN_SPEED      = 2,
 	UNICORN_DIFF       = 250,
 	UNICORN_PTS        = 2321,
-	UNICORN_FIRE_DELAY = 500,
+	UNICORN_FIRE_DELAY = 100,
+	LAZER_SPEED        = 17,
 	CAT_ACCEL          = 0.2,
 	SURVIVAL_PTS       = 1;
 
@@ -30,7 +31,6 @@ var assets,
 	loader,
 	building,
 	grumpyCat,
-	unicorn,
 	sky,
 	stage,
 	scoreText;
@@ -142,8 +142,20 @@ function fireCheezburger() {
 	stage.addChild(cb);
 }
 
-function fireLazer() {
+function fireLazer(unicorn) {
+	var l = new createjs.Bitmap(loader.getResult("lazer"));
+	l.x = unicorn.x;
+	l.y = unicorn.y;
+	unicorn.lazerArray.push(l);
+	stage.addChild(l);
+}
 
+//removes all children in an array from display list
+function removeChildren(array) {
+	var i;
+	for(i=0; i<=array.length-1; i++) {
+		stage.removeChild(array[i]);
+	}
 }
 
 // function outOfBounds(o, bounds) {
@@ -152,9 +164,11 @@ function fireLazer() {
 // }
 
 function generateUnicorn() {
-	var u = new createjs.Bitmap(loader.getResult("unicorn"));
-	u.x   = w - 20;
-	u.y   = Math.random() * h;
+	var u          = new createjs.Bitmap(loader.getResult("unicorn"));
+	u.lazerCounter = 0;
+	u.lazerArray   = [];
+	u.x            = w - 20;
+	u.y            = Math.random() * h;
 	//force unicorns on screen -- we should probably make this a function to make it fancier
 	if(u.y >= (h - UNICORN_H)){ u.y = h - UNICORN_H; }
     if(u.y <= 0) { u.y = 0; }
@@ -190,7 +204,9 @@ function tick(event) {
 				if(unicornArray[j].hitTest(pt.x, pt.y)) {
 					points += UNICORN_PTS;
 					scoreText.text = points;
+					removeChildren(unicornArray[j].lazerArray);
 					stage.removeChild(unicornArray[j]);
+					unicornArray.lazerArray = [];
 					unicornArray.splice(j, 1);
 				}
 			}
@@ -207,6 +223,21 @@ function tick(event) {
 
     for(i=0; i<= unicornArray.length-1; i++){
 		unicornArray[i].x = unicornArray[i].x - UNICORN_SPEED;
+		unicornArray[i].lazerCounter++;
+
+		if((unicornArray[i].lazerCounter % UNICORN_FIRE_DELAY) === 0) {
+			fireLazer(unicornArray[i]);
+		}
+		var k;
+		for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
+			var l = unicornArray[i].lazerArray[k];
+			l.x -= LAZER_SPEED;
+			if(l.x <= -100) { //should use the lazer's actual width
+				stage.removeChild(l);
+				unicornArray[i].lazerArray.splice(k, 1);
+			}
+		}
+
 		// hitTest(unicornArray[i]);
 		//if(unicornArray[i].x == grumpyCat.x && unicornArray.y == grumpyCat.y){
 		//console.log('crash');
@@ -215,6 +246,8 @@ function tick(event) {
 		//remove unicorn when off screen
 		if(unicornArray[i].x <= -UNICORN_W) {
 			stage.removeChild(unicornArray[i]);
+			unicornArray[i].lazerArray = [];
+			unicornArray[i] = null;
 			unicornArray.splice(i, 1);
 		}
     }
