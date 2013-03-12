@@ -1,20 +1,32 @@
 //our game business
 
 //constants
-var KEYCODE_UP    = 38,
-	KEYCODE_DOWN  = 40,
-	KEYCODE_SPACE = 32,
+var KEYCODE_UP         = 38,
+	KEYCODE_DOWN       = 40,
+	KEYCODE_SPACE      = 32,
 	//size constants
-	UNICORN_W     = 150,
-	UNICORN_H     = 141,
-	CAT_W         = 138,
-	CAT_H         = 83,
+	UNICORN_W          = 150,
+	UNICORN_H          = 141,
+	CAT_W              = 138,
+	CAT_H              = 83,
 	//speed constants
+<<<<<<< HEAD
 	BURGER_SPEED  = 17, 
 	BURGER_TIME   = 5,  //ticks between cheezburgerz
 	UNICORN_SPEED = 2,
 	UNICORN_DIFF  = 250,
 	CAT_ACCEL     = 0.2;
+=======
+	BURGER_SPEED       = 17, //how fast cheezburgerz move
+	BURGER_TIME        = 5,  //ticks between cheezburgerz
+	UNICORN_SPEED      = 2,
+	UNICORN_DIFF       = 250,
+	UNICORN_PTS        = 2321,
+	UNICORN_FIRE_DELAY = 100,
+	LAZER_SPEED        = 17,
+	CAT_ACCEL          = 0.2,
+	SURVIVAL_PTS       = 1;
+>>>>>>> 8bddac39deef6723aa8f67200a89aa7c31861087
 
 //booleans
 var isGCAlive,
@@ -27,24 +39,25 @@ var assets,
 	loader,
 	building,
 	grumpyCat,
-	unicorn,
 	sky,
-	stage;
+	stage,
+	scoreText;
 
 //variables
-var tickIndex    = 0,
-	burgerArray  = [],
-	unicornArray = [],
+var tickIndex     = 0,
+	burgerArray   = [],
+	unicornArray  = [],
 	w,
 	h,
-	vy           = 0,
-	ay           = 0;
+	vy            = 0,
+	ay            = 0,
+	points        = 0;
 
 function init() {
 	var canvas = document.getElementById("testCanvas");
 	w          = canvas.width;
 	h          = canvas.height;
-    assets     = []; 
+	assets     = [];
 	// create a stage object to work with the canvas. This is the top level node in the display list:
 	stage      = new createjs.Stage(canvas);
 	manifest   = [
@@ -61,6 +74,15 @@ function init() {
     loader.onComplete = handleComplete;
     loader.loadManifest(manifest);
     stage.autoClear   = false;
+
+    scoreText = new createjs.Text(points, "36px Arial", "#FFF");
+    scoreText.textAlign = "right";
+    scoreText.x = w - 25;
+    scoreText.y = 20;
+
+    //grumpyMoves & fires
+	document.onkeydown = handleKeyDown;
+    document.onkeyup = handleKeyUp;
 }
 
 function handleFileLoad(event) {
@@ -94,7 +116,7 @@ function handleComplete() {
 				break;
 		}
 	}
-	stage.addChild(sky, buildings, grumpyCat);
+	stage.addChild(sky, buildings, grumpyCat, scoreText);
 	createjs.Ticker.setFPS(60);
 	createjs.Ticker.addEventListener("tick", tick);
 }
@@ -119,7 +141,7 @@ function handleKeyUp(e) {
 	ay = 0;
 }
 
-function fireCheezburger() { 
+function fireCheezburger() {
 	var cb = new createjs.Bitmap(loader.getResult("cheezburger"));
 	cb.x   = (grumpyCat.x * 2) + 37;
 	cb.y   = (grumpyCat.y + 42);
@@ -127,11 +149,33 @@ function fireCheezburger() {
 	//createjs.Sound.play("laser", createjs.Sound.INTERUPT_LATE);
 	stage.addChild(cb);
 }
+function fireLazer(unicorn) {
+	var l = new createjs.Bitmap(loader.getResult("lazer"));
+	l.x = unicorn.x;
+	l.y = unicorn.y;
+	unicorn.lazerArray.push(l);
+	stage.addChild(l);
+}
 
-function unicornAttack() {
-	var u = new createjs.Bitmap(loader.getResult("unicorn"));
-	u.x   = w - 20;
-	u.y   = Math.random() * h;
+//removes all children in an array from display list
+function removeChildren(array) {
+	var i;
+	for(i=0; i<=array.length-1; i++) {
+		stage.removeChild(array[i]);
+	}
+}
+
+// function outOfBounds(o, bounds) {
+// 	//is it visibly off screen
+// 	return o.x < bounds*-2 || o.y < bounds*-2 || o.x > canvas.width+bounds*2 || o.y > canvas.height+bounds*2;
+// }
+
+function generateUnicorn() {
+	var u          = new createjs.Bitmap(loader.getResult("unicorn"));
+	u.lazerCounter = 0;
+	u.lazerArray   = [];
+	u.x            = w - 20;
+	u.y            = Math.random() * h;
 	//force unicorns on screen -- we should probably make this a function to make it fancier
 	if(u.y >= (h - UNICORN_H)){ u.y = h - UNICORN_H; }
     if(u.y <= 0) { u.y = 0; }
@@ -146,9 +190,6 @@ function tick(event) {
 	buildings.x = (buildings.x - 1.8);
 	if(buildings.x + 103 <= 0) { buildings.x = outside; }
 
-	//grumpyMoves & fires
-	document.onkeydown = handleKeyDown;
-    document.onkeyup = handleKeyUp;
     vy += ay;
     grumpyCat.y += vy;
     //force him on screen
@@ -168,23 +209,54 @@ function tick(event) {
 			for(j=0; j<=unicornArray.length-1; j++) {
 				var pt = burgerArray[i].localToLocal(0, 0, unicornArray[j]);
 				if(unicornArray[j].hitTest(pt.x, pt.y)) {
+					points += UNICORN_PTS;
+					scoreText.text = points;
+					removeChildren(unicornArray[j].lazerArray);
 					stage.removeChild(unicornArray[j]);
+					unicornArray.lazerArray = [];
 					unicornArray.splice(j, 1);
 				}
 			}
 		}
     }
 
+    //you get points for just surviving as well
+    points += SURVIVAL_PTS;
+    scoreText.text = points;
+
 	if((tickIndex % UNICORN_DIFF) === 0){
-		unicornAttack();
+		generateUnicorn();
     }
 
     for(i=0; i<= unicornArray.length-1; i++){
 		unicornArray[i].x = unicornArray[i].x - UNICORN_SPEED;
+		unicornArray[i].lazerCounter++;
+
+		if((unicornArray[i].lazerCounter % UNICORN_FIRE_DELAY) === 0) {
+			fireLazer(unicornArray[i]);
+		}
+		var k;
+		for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
+			var l = unicornArray[i].lazerArray[k];
+			l.x -= LAZER_SPEED;
+			if(l.x <= -100) { //should use the lazer's actual width
+				stage.removeChild(l);
+				unicornArray[i].lazerArray.splice(k, 1);
+			}
+		}
+
 		// hitTest(unicornArray[i]);
 		//if(unicornArray[i].x == grumpyCat.x && unicornArray.y == grumpyCat.y){
 		//console.log('crash');
 		//}
+
+		//remove unicorn when off screen
+		if(unicornArray[i].x <= -UNICORN_W) {
+			stage.removeChild(unicornArray[i]);
+			unicornArray[i].lazerArray = [];
+			unicornArray[i] = null;
+			unicornArray.splice(i, 1);
+		}
     }
     tickIndex++;
 	stage.update(event);
