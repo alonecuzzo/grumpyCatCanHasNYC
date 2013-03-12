@@ -1,21 +1,23 @@
 //our game business
 
 //constants
-var KEYCODE_UP    = 38,
-	KEYCODE_DOWN  = 40,
-	KEYCODE_SPACE = 32,
+var KEYCODE_UP         = 38,
+	KEYCODE_DOWN       = 40,
+	KEYCODE_SPACE      = 32,
 	//size constants
-	UNICORN_W     = 150,
-	UNICORN_H     = 141,
-	CAT_W         = 138,
-	CAT_H         = 83,
+	UNICORN_W          = 150,
+	UNICORN_H          = 141,
+	CAT_W              = 138,
+	CAT_H              = 83,
 	//speed constants
-	BURGER_SPEED  = 17, //how fast cheezburgerz move
-	BURGER_TIME   = 5,  //ticks between cheezburgerz
-	UNICORN_SPEED = 2,
-	UNICORN_DIFF  = 250,
-	UNICORN_PTS   = 2321,
-	CAT_ACCEL     = 0.2;
+	BURGER_SPEED       = 17, //how fast cheezburgerz move
+	BURGER_TIME        = 5,  //ticks between cheezburgerz
+	UNICORN_SPEED      = 2,
+	UNICORN_DIFF       = 250,
+	UNICORN_PTS        = 2321,
+	UNICORN_FIRE_DELAY = 100,
+	CAT_ACCEL          = 0.2,
+	SURVIVAL_PTS       = 1;
 
 //booleans
 var isGCAlive,
@@ -34,20 +36,20 @@ var assets,
 	scoreText;
 
 //variables
-var tickIndex    = 0,
-	burgerArray  = [],
-	unicornArray = [],
+var tickIndex     = 0,
+	burgerArray   = [],
+	unicornArray  = [],
 	w,
 	h,
-	vy           = 0,
-	ay           = 0,
-	points       = 0;
+	vy            = 0,
+	ay            = 0,
+	points        = 0;
 
 function init() {
 	var canvas = document.getElementById("testCanvas");
 	w          = canvas.width;
 	h          = canvas.height;
-    assets     = [];
+	assets     = [];
 	// create a stage object to work with the canvas. This is the top level node in the display list:
 	stage      = new createjs.Stage(canvas);
 	manifest   = [
@@ -145,7 +147,7 @@ function fireCheezburger() {
 // 	return o.x < bounds*-2 || o.y < bounds*-2 || o.x > canvas.width+bounds*2 || o.y > canvas.height+bounds*2;
 // }
 
-function unicornAttack() {
+function generateUnicorn() {
 	var u = new createjs.Bitmap(loader.getResult("unicorn"));
 	u.x   = w - 20;
 	u.y   = Math.random() * h;
@@ -163,7 +165,6 @@ function tick(event) {
 	buildings.x = (buildings.x - 1.8);
 	if(buildings.x + 103 <= 0) { buildings.x = outside; }
 
-	
     vy += ay;
     grumpyCat.y += vy;
     //force him on screen
@@ -192,8 +193,12 @@ function tick(event) {
 		}
     }
 
+    //you get points for just surviving as well
+    points += SURVIVAL_PTS;
+    scoreText.text = points;
+
 	if((tickIndex % UNICORN_DIFF) === 0){
-		unicornAttack();
+		generateUnicorn();
     }
 
     for(i=0; i<= unicornArray.length-1; i++){
