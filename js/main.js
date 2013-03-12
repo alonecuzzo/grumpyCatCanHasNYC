@@ -140,15 +140,6 @@ function unicornAttack() {
 	stage.addChild(u);
 }
 
-function hitTest(a) {
-	// for(var i = 0; i <= burgerArray.length - 1; i++) {
-	// 	for(var j = 0; j <= unicornArray.length - 1; j++) {		
-	// 		var pt = burgerArray[i].localToLocal(burgerArray[i].x, burgerArray[i].y, unicornArray[j]);
-	// 		if (unicornArray[j].hitTest(pt.x, pt.y)) { console.log('lolz'); }
-	// 	}
-	// }
-}
-
 function tick(event) {
 	//Buildings
 	var outside = w + 15;
@@ -161,12 +152,8 @@ function tick(event) {
     vy += ay;
     grumpyCat.y += vy;
     //force him on screen
-    if(grumpyCat.y >= (h - CAT_H)){
-		grumpyCat.y = h - CAT_H;
-    }
-    if(grumpyCat.y <= 0) {
-		grumpyCat.y = 0;
-    }
+    if(grumpyCat.y >= (h - CAT_H)){ grumpyCat.y = h - CAT_H; }
+    if(grumpyCat.y <= 0) { grumpyCat.y = 0; }
 
     //handle burger firing 
     var i;
