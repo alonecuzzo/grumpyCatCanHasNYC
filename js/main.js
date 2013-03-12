@@ -137,6 +137,7 @@ function unicornAttack() {
 	var u = new createjs.Bitmap(loader.getResult("unicorn"));
 	u.x   = w - 20;
 	u.y   = Math.random() * h;
+	//force unicorns on screen -- we should probably make this a function to make it fancier
 	if(u.y >= (h - UNICORN_H)){ u.y = h - UNICORN_H; }
     if(u.y <= 0) { u.y = 0; }
 
