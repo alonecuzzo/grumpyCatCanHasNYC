@@ -15,7 +15,7 @@ var KEYCODE_UP         = 38,
 	UNICORN_SPEED      = 2,
 	UNICORN_DIFF       = 250,
 	UNICORN_PTS        = 2321,
-	UNICORN_FIRE_DELAY = 100,
+	UNICORN_FIRE_DELAY = 500,
 	CAT_ACCEL          = 0.2,
 	SURVIVAL_PTS       = 1;
 
@@ -142,6 +142,10 @@ function fireCheezburger() {
 	stage.addChild(cb);
 }
 
+function fireLazer() {
+
+}
+
 // function outOfBounds(o, bounds) {
 // 	//is it visibly off screen
 // 	return o.x < bounds*-2 || o.y < bounds*-2 || o.x > canvas.width+bounds*2 || o.y > canvas.height+bounds*2;
@@ -207,6 +211,12 @@ function tick(event) {
 		//if(unicornArray[i].x == grumpyCat.x && unicornArray.y == grumpyCat.y){
 		//console.log('crash');
 		//}
+
+		//remove unicorn when off screen
+		if(unicornArray[i].x <= -UNICORN_W) {
+			stage.removeChild(unicornArray[i]);
+			unicornArray.splice(i, 1);
+		}
     }
     tickIndex++;
 	stage.update(event);
