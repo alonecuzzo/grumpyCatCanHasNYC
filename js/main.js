@@ -44,7 +44,7 @@ function init() {
 	var canvas = document.getElementById("testCanvas");
 	w          = canvas.width;
 	h          = canvas.height;
-    assets     = []; //gets populated on load
+    assets     = []; 
 	// create a stage object to work with the canvas. This is the top level node in the display list:
 	stage      = new createjs.Stage(canvas);
 	manifest   = [
@@ -118,7 +118,7 @@ function handleKeyUp(e) {
 	ay = 0;
 }
 
-function fireCheezburger() { //138X83
+function fireCheezburger() { 
 	var cb = new createjs.Bitmap(loader.getResult("cheezburger"));
 	cb.x   = (grumpyCat.x * 2) + 37;
 	cb.y   = (grumpyCat.y + 42);
