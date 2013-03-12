@@ -181,7 +181,7 @@ function tick(event) {
 
     for(i=0; i<= unicornArray.length-1; i++){
 		unicornArray[i].x = unicornArray[i].x - UNICORN_SPEED;
-		hitTest(unicornArray[i]);
+		//hitTest(unicornArray[i]);
 		//if(unicornArray[i].x == grumpyCat.x && unicornArray.y == grumpyCat.y){
 		//console.log('crash');
 		//}
