@@ -14,6 +14,7 @@ var KEYCODE_UP    = 38,
 	BURGER_TIME   = 5,  //ticks between cheezburgerz
 	UNICORN_SPEED = 2,
 	UNICORN_DIFF  = 250,
+	UNICORN_PTS   = 2321,
 	CAT_ACCEL     = 0.2;
 
 //booleans
@@ -29,7 +30,8 @@ var assets,
 	grumpyCat,
 	unicorn,
 	sky,
-	stage;
+	stage,
+	scoreText;
 
 //variables
 var tickIndex    = 0,
@@ -38,13 +40,14 @@ var tickIndex    = 0,
 	w,
 	h,
 	vy           = 0,
-	ay           = 0;
+	ay           = 0,
+	points       = 0;
 
 function init() {
 	var canvas = document.getElementById("testCanvas");
 	w          = canvas.width;
 	h          = canvas.height;
-    assets     = []; 
+    assets     = [];
 	// create a stage object to work with the canvas. This is the top level node in the display list:
 	stage      = new createjs.Stage(canvas);
 	manifest   = [
@@ -61,6 +64,11 @@ function init() {
     loader.onComplete = handleComplete;
     loader.loadManifest(manifest);
     stage.autoClear   = false;
+
+    scoreText = new createjs.Text(points, "36px Arial", "#FFF");
+    scoreText.textAlign = "right";
+    scoreText.x = w - 25;
+    scoreText.y = 20;
 }
 
 function handleFileLoad(event) {
@@ -94,7 +102,7 @@ function handleComplete() {
 				break;
 		}
 	}
-	stage.addChild(sky, buildings, grumpyCat);
+	stage.addChild(sky, buildings, grumpyCat, scoreText);
 	createjs.Ticker.setFPS(60);
 	createjs.Ticker.addEventListener("tick", tick);
 }
@@ -119,7 +127,7 @@ function handleKeyUp(e) {
 	ay = 0;
 }
 
-function fireCheezburger() { 
+function fireCheezburger() {
 	var cb = new createjs.Bitmap(loader.getResult("cheezburger"));
 	cb.x   = (grumpyCat.x * 2) + 37;
 	cb.y   = (grumpyCat.y + 42);
@@ -173,6 +181,8 @@ function tick(event) {
 			for(j=0; j<=unicornArray.length-1; j++) {
 				var pt = burgerArray[i].localToLocal(0, 0, unicornArray[j]);
 				if(unicornArray[j].hitTest(pt.x, pt.y)) {
+					points += UNICORN_PTS;
+					scoreText.text = points;
 					stage.removeChild(unicornArray[j]);
 					unicornArray.splice(j, 1);
 				}
