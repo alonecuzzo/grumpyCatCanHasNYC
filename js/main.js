@@ -10,7 +10,7 @@ var KEYCODE_UP    = 38,
 	CAT_W         = 138,
 	CAT_H         = 83,
 	//speed constants
-	BURGER_SPEED  = 17, //how fast cheezburgerz move
+	BURGER_SPEED  = 17, 
 	BURGER_TIME   = 5,  //ticks between cheezburgerz
 	UNICORN_SPEED = 2,
 	UNICORN_DIFF  = 250,
@@ -127,11 +127,6 @@ function fireCheezburger() {
 	//createjs.Sound.play("laser", createjs.Sound.INTERUPT_LATE);
 	stage.addChild(cb);
 }
-
-// function outOfBounds(o, bounds) {
-// 	//is it visibly off screen
-// 	return o.x < bounds*-2 || o.y < bounds*-2 || o.x > canvas.width+bounds*2 || o.y > canvas.height+bounds*2;
-// }
 
 function unicornAttack() {
 	var u = new createjs.Bitmap(loader.getResult("unicorn"));
