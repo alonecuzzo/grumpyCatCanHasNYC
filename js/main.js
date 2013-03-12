@@ -103,6 +103,7 @@ function handleKeyDown(e) {
 	switch(e.which) {
 		case KEYCODE_UP:
 			ay = -CAT_ACCEL;
+			// isUpHeld = true;
 			break;
 		case KEYCODE_DOWN:
 			ay = CAT_ACCEL;
@@ -136,6 +137,9 @@ function unicornAttack() {
 	var u = new createjs.Bitmap(loader.getResult("unicorn"));
 	u.x   = w - 20;
 	u.y   = Math.random() * h;
+	if(u.y >= (h - UNICORN_H)){ u.y = h - UNICORN_H; }
+    if(u.y <= 0) { u.y = 0; }
+
 	unicornArray.push(u);
 	stage.addChild(u);
 }
@@ -181,7 +185,7 @@ function tick(event) {
 
     for(i=0; i<= unicornArray.length-1; i++){
 		unicornArray[i].x = unicornArray[i].x - UNICORN_SPEED;
-		hitTest(unicornArray[i]);
+		// hitTest(unicornArray[i]);
 		//if(unicornArray[i].x == grumpyCat.x && unicornArray.y == grumpyCat.y){
 		//console.log('crash');
 		//}
