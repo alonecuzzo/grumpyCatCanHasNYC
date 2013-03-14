@@ -10,14 +10,7 @@ var KEYCODE_UP         = 38,
 	CAT_W              = 138,
 	CAT_H              = 83,
 	//speed constants
-<<<<<<< HEAD
-	BURGER_SPEED  = 17, 
-	BURGER_TIME   = 5,  //ticks between cheezburgerz
-	UNICORN_SPEED = 2,
-	UNICORN_DIFF  = 250,
-	CAT_ACCEL     = 0.2;
-=======
-	BURGER_SPEED       = 17, //how fast cheezburgerz move
+	BURGER_SPEED       = 17, 
 	BURGER_TIME        = 5,  //ticks between cheezburgerz
 	UNICORN_SPEED      = 2,
 	UNICORN_DIFF       = 250,
@@ -26,7 +19,6 @@ var KEYCODE_UP         = 38,
 	LAZER_SPEED        = 17,
 	CAT_ACCEL          = 0.2,
 	SURVIVAL_PTS       = 1;
->>>>>>> 8bddac39deef6723aa8f67200a89aa7c31861087
 
 //booleans
 var isGCAlive,
@@ -103,6 +95,7 @@ function handleComplete() {
 				grumpyCat   = new createjs.Bitmap(result);
 				grumpyCat.x = w - (w-100);
 				grumpyCat.y = 100;
+				isGCAlive = true;
 				break;
 			case "unicorn":
 				break;
@@ -165,23 +158,30 @@ function removeChildren(array) {
 	}
 }
 
-// function outOfBounds(o, bounds) {
-// 	//is it visibly off screen
-// 	return o.x < bounds*-2 || o.y < bounds*-2 || o.x > canvas.width+bounds*2 || o.y > canvas.height+bounds*2;
-// }
-
 function generateUnicorn() {
 	var u          = new createjs.Bitmap(loader.getResult("unicorn"));
 	u.lazerCounter = 0;
 	u.lazerArray   = [];
 	u.x            = w - 20;
 	u.y            = Math.random() * h;
-	//force unicorns on screen -- we should probably make this a function to make it fancier
+	//force unicorns on screen 
 	if(u.y >= (h - UNICORN_H)){ u.y = h - UNICORN_H; }
     if(u.y <= 0) { u.y = 0; }
 
 	unicornArray.push(u);
 	stage.addChild(u);
+}
+
+function gameover(){
+	var title = "Game Over";
+	var gameOverTitle = new createjs.Text(title, "60px Arial", "#FFF");
+    gameOverTitle.textAlign = "center";
+    gameOverTitle.x = w / 2;
+	gameOverTitle.y = h / 2;
+
+	stage.removeChild(grumpyCat);
+	stage.addChild(gameOverTitle);
+	isGCAlive =false;
 }
 
 function tick(event) {
@@ -221,12 +221,31 @@ function tick(event) {
     }
 
     //you get points for just surviving as well
-    points += SURVIVAL_PTS;
+    if(isGCAlive){ points += SURVIVAL_PTS;}
+  
     scoreText.text = points;
 
 	if((tickIndex % UNICORN_DIFF) === 0){
 		generateUnicorn();
     }
+
+	// need to add lazer!
+	for(i=0; i<=unicornArray.length-1; i++) {
+		var pt = unicornArray[i].localToLocal(0,0,grumpyCat);
+		if(grumpyCat.hitTest(pt.x, pt.y)) {
+			gameover();
+		}
+		var k;
+		for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
+			var pt2 = unicornArray[i].lazerArray[k].localToLocal(0,0,grumpyCat);
+			if(grumpyCat.hitTest(pt2.x, pt2.y)) {
+				gameover();
+			}
+		}
+	}
+
+
+
 
     for(i=0; i<= unicornArray.length-1; i++){
 		unicornArray[i].x = unicornArray[i].x - UNICORN_SPEED;
@@ -244,11 +263,6 @@ function tick(event) {
 				unicornArray[i].lazerArray.splice(k, 1);
 			}
 		}
-
-		// hitTest(unicornArray[i]);
-		//if(unicornArray[i].x == grumpyCat.x && unicornArray.y == grumpyCat.y){
-		//console.log('crash');
-		//}
 
 		//remove unicorn when off screen
 		if(unicornArray[i].x <= -UNICORN_W) {
