@@ -173,8 +173,7 @@ function generateUnicorn() {
 }
 
 function gameover(){
-	var title = "Game Over";
-	var gameOverTitle = new createjs.Text(title, "60px Arial", "#FFF");
+	var gameOverTitle = new createjs.Text("Game Over", "60px Arial", "#FFF");
     gameOverTitle.textAlign = "center";
     gameOverTitle.x = w / 2;
 	gameOverTitle.y = h / 2;
