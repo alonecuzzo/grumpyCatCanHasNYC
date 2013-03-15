@@ -10,7 +10,7 @@ var KEYCODE_UP         = 38,
 	CAT_W              = 138,
 	CAT_H              = 83,
 	//speed constants
-	BURGER_SPEED       = 17, 
+	BURGER_SPEED       = 17,
 	BURGER_TIME        = 5,  //ticks between cheezburgerz
 	UNICORN_SPEED      = 2,
 	UNICORN_DIFF       = 250,
@@ -24,7 +24,8 @@ var KEYCODE_UP         = 38,
 var isGCAlive,
 	isUpHeld      = false,
 	isDownHeld    = false,
-	isFireHeld    = false;
+	isFireHeld    = false,
+	isGameActive  = false;
 
 //assets
 var assets,
@@ -33,7 +34,9 @@ var assets,
 	grumpyCat,
 	sky,
 	stage,
-	scoreText;
+	scoreText,
+	titleScreenBkgrnd,
+	titleScreenText;
 
 //variables
 var tickIndex     = 0,
@@ -58,7 +61,8 @@ function init() {
         {src:"img/grumpyCat.png", id:"grumpyCat"},
         {src:"img/lazer.png", id:"lazer"},
         {src:"img/unicorn.png", id:"unicorn"},
-        {src:"img/sky.png", id:"sky"}
+        {src:"img/sky.png", id:"sky"},
+        {src:"img/titleScreen_bkgrnd.png", id:"titleScreenBkgrnd"}
     ];
 
 	loader            = new createjs.LoadQueue(false);
@@ -107,9 +111,13 @@ function handleComplete() {
 				buildings.x = 500;
 				buildings.y = h - 200;
 				break;
+			case "titleScreenBkgrnd":
+				titleScreenBkgrnd = new createjs.Shape(new createjs.Graphics().beginBitmapFill(result).drawRect(0,0,w,h));
+				break;
 		}
 	}
-	stage.addChild(sky, buildings, grumpyCat, scoreText);
+	stage.addChild(sky, buildings, grumpyCat, scoreText, titleScreenBkgrnd);
+	createTitleScreen();
 	createjs.Ticker.setFPS(60);
 	createjs.Ticker.addEventListener("tick", tick);
 }
@@ -142,6 +150,7 @@ function fireCheezburger() {
 	//createjs.Sound.play("laser", createjs.Sound.INTERUPT_LATE);
 	stage.addChild(cb);
 }
+
 function fireLazer(unicorn) {
 	var l = new createjs.Bitmap(loader.getResult("lazer"));
 	l.x = unicorn.x;
@@ -172,107 +181,117 @@ function generateUnicorn() {
 	stage.addChild(u);
 }
 
-function gameover(){
+function createTitleScreen() {
+	titleScreenText = new createjs.Text("Welcome to our game, click anywhere to begin!", "30px Arial", "#FFF");
+	titleScreenText.x = 10;
+	titleScreenText.y = 10;
+	stage.addChild(titleScreenText);
+	titleScreenBkgrnd.addEventListener('click', startGame);
+}
+
+function startGame() {
+	removeChildren([titleScreenBkgrnd, titleScreenText]);
+	isGameActive = true;
+}
+
+function gameover() {
 	var title = "Game Over";
 	var gameOverTitle = new createjs.Text(title, "60px Arial", "#FFF");
     gameOverTitle.textAlign = "center";
     gameOverTitle.x = w / 2;
 	gameOverTitle.y = h / 2;
-
 	stage.removeChild(grumpyCat);
 	stage.addChild(gameOverTitle);
 	isGCAlive =false;
 }
 
 function tick(event) {
-	//Buildings
-	var outside = w + 15;
-	buildings.x = (buildings.x - 1.8);
-	if(buildings.x + 103 <= 0) { buildings.x = outside; }
+	if(isGameActive){
+		//Buildings
+		var outside = w + 15;
+		buildings.x = (buildings.x - 1.8);
+		if(buildings.x + 103 <= 0) { buildings.x = outside; }
 
-    vy += ay;
-    grumpyCat.y += vy;
-    //force him on screen
-    if(grumpyCat.y >= (h - CAT_H)){ grumpyCat.y = h - CAT_H; }
-    if(grumpyCat.y <= 0) { grumpyCat.y = 0; }
+		vy += ay;
+		grumpyCat.y += vy;
+		//force him on screen
+		if(grumpyCat.y >= (h - CAT_H)){ grumpyCat.y = h - CAT_H; }
+		if(grumpyCat.y <= 0) { grumpyCat.y = 0; }
 
-    //handle burger firing 
-    var i;
-    for(i=0; i<=burgerArray.length-1; i++) {
-		burgerArray[i].x = burgerArray[i].x + BURGER_SPEED;
-		if(burgerArray[i].x >= w + 10) {
-			stage.removeChild(burgerArray[i]);
-			burgerArray.splice(i, 1);
-		} else {
-			//check and see if the burger has hit anything
-			var j;
-			for(j=0; j<=unicornArray.length-1; j++) {
-				var pt = burgerArray[i].localToLocal(0, 0, unicornArray[j]);
-				if(unicornArray[j].hitTest(pt.x, pt.y)) {
-					points += UNICORN_PTS;
-					scoreText.text = points;
-					removeChildren(unicornArray[j].lazerArray);
-					stage.removeChild(unicornArray[j]);
-					unicornArray.lazerArray = [];
-					unicornArray.splice(j, 1);
+		//handle burger firing 
+		var i;
+		for(i=0; i<=burgerArray.length-1; i++) {
+			burgerArray[i].x = burgerArray[i].x + BURGER_SPEED;
+			if(burgerArray[i].x >= w + 10) {
+				stage.removeChild(burgerArray[i]);
+				burgerArray.splice(i, 1);
+			} else {
+				//check and see if the burger has hit anything
+				var j;
+				for(j=0; j<=unicornArray.length-1; j++) {
+					var pt = burgerArray[i].localToLocal(0, 0, unicornArray[j]);
+					if(unicornArray[j].hitTest(pt.x, pt.y)) {
+						points += UNICORN_PTS;
+						scoreText.text = points;
+						removeChildren(unicornArray[j].lazerArray);
+						stage.removeChild(unicornArray[j]);
+						unicornArray.lazerArray = [];
+						unicornArray.splice(j, 1);
+					}
 				}
 			}
 		}
-    }
 
-    //you get points for just surviving as well
-    if(isGCAlive){ points += SURVIVAL_PTS;}
-  
-    scoreText.text = points;
+		//you get points for just surviving as well
+		if(isGCAlive){ points += SURVIVAL_PTS; }
+		scoreText.text = points;
 
-	if((tickIndex % UNICORN_DIFF) === 0){
-		generateUnicorn();
-    }
+		if((tickIndex % UNICORN_DIFF) === 0){ generateUnicorn(); }
 
-	// need to add lazer!
-	for(i=0; i<=unicornArray.length-1; i++) {
-		var pt = unicornArray[i].localToLocal(0,0,grumpyCat);
-		if(grumpyCat.hitTest(pt.x, pt.y)) {
-			gameover();
-		}
-		var k;
-		for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
-			var pt2 = unicornArray[i].lazerArray[k].localToLocal(0,0,grumpyCat);
-			if(grumpyCat.hitTest(pt2.x, pt2.y)) {
+		// need to add lazer!
+		for(i=0; i<=unicornArray.length-1; i++) {
+			var pt = unicornArray[i].localToLocal(0, UNICORN_H / 2,grumpyCat);
+			if(grumpyCat.hitTest(pt.x, pt.y)) {
 				gameover();
+				console.log('hit');
+				break;
+			}
+			var k;
+			for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
+				var pt2 = unicornArray[i].lazerArray[k].localToLocal(0,0,grumpyCat);
+				if(grumpyCat.hitTest(pt2.x, pt2.y)) {
+					gameover();
+				}
 			}
 		}
+
+		for(i=0; i<= unicornArray.length-1; i++){
+			unicornArray[i].x = unicornArray[i].x - UNICORN_SPEED;
+			unicornArray[i].lazerCounter++;
+
+			if((unicornArray[i].lazerCounter % UNICORN_FIRE_DELAY) === 0) {
+				fireLazer(unicornArray[i]);
+			}
+			var k;
+			for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
+				var l = unicornArray[i].lazerArray[k];
+				l.x -= LAZER_SPEED;
+				if(l.x <= -100) { //should use the lazer's actual width
+					stage.removeChild(l);
+					unicornArray[i].lazerArray.splice(k, 1);
+				}
+			}
+
+			//remove unicorn when off screen
+			if(unicornArray[i].x <= -UNICORN_W) {
+				stage.removeChild(unicornArray[i]);
+				unicornArray[i].lazerArray = [];
+				unicornArray[i] = null;
+				unicornArray.splice(i, 1);
+			}
+		}
+		tickIndex++;
 	}
-
-
-
-
-    for(i=0; i<= unicornArray.length-1; i++){
-		unicornArray[i].x = unicornArray[i].x - UNICORN_SPEED;
-		unicornArray[i].lazerCounter++;
-
-		if((unicornArray[i].lazerCounter % UNICORN_FIRE_DELAY) === 0) {
-			fireLazer(unicornArray[i]);
-		}
-		var k;
-		for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
-			var l = unicornArray[i].lazerArray[k];
-			l.x -= LAZER_SPEED;
-			if(l.x <= -100) { //should use the lazer's actual width
-				stage.removeChild(l);
-				unicornArray[i].lazerArray.splice(k, 1);
-			}
-		}
-
-		//remove unicorn when off screen
-		if(unicornArray[i].x <= -UNICORN_W) {
-			stage.removeChild(unicornArray[i]);
-			unicornArray[i].lazerArray = [];
-			unicornArray[i] = null;
-			unicornArray.splice(i, 1);
-		}
-    }
-    tickIndex++;
 	stage.update(event);
 }
 
