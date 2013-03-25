@@ -182,26 +182,34 @@ function generateUnicorn() {
 }
 
 function createTitleScreen() {
-	titleScreenText = new createjs.Text("Welcome to our game, click anywhere to begin!", "30px Arial", "#FFF");
-	titleScreenText.x = 10;
-	titleScreenText.y = 10;
+	titleScreenText 	= new createjs.Text("Welcome to our game, click anywhere to begin!", "30px Arial", "#FFF");
+	titleScreenText.textAlign = "center";
+	titleScreenText.x 	= w / 2;
+	titleScreenText.y 	= h / 2 - 25;
 	stage.addChild(titleScreenText);
 	titleScreenBkgrnd.addEventListener('click', startGame);
 }
 
 function startGame() {
 	removeChildren([titleScreenBkgrnd, titleScreenText]);
-	isGameActive = true;
+	isGameActive 	= true;
 }
 
 function gameover() {
 	var gameOverTitle = new createjs.Text("GameOver", "60px Arial", "#FFF");
-    gameOverTitle.textAlign = "center";
-    gameOverTitle.x = w / 2;
+	gameOverTitle.textAlign = "center";
+	gameOverTitle.x = w / 2;
 	gameOverTitle.y = h / 2;
 	stage.removeChild(grumpyCat);
 	stage.addChild(gameOverTitle);
 	isGCAlive =false;
+}
+
+function isHit(u){
+	collisionMethod = ndgmr.checkPixelCollision;
+	var intersection = collisionMethod(grumpyCat,u,0.75);
+	if (intersection) {return true;} 
+	else {return false;}
 }
 
 function tick(event) {
@@ -211,13 +219,22 @@ function tick(event) {
 		buildings.x = (buildings.x - 1.8);
 		if(buildings.x + 103 <= 0) { buildings.x = outside; }
 
+		//position of GrumpyCat
 		vy += ay;
 		grumpyCat.y += vy;
-		//force him on screen
+
+		//force GrumpyCat on screen
 		if(grumpyCat.y >= (h - CAT_H)){ grumpyCat.y = h - CAT_H; }
 		if(grumpyCat.y <= 0) { grumpyCat.y = 0; }
 
-		//handle burger firing 
+		//you get points for just surviving 
+		if(isGCAlive){ points += SURVIVAL_PTS; }
+		scoreText.text = points;
+
+		//Unicorn appears on scren based on difficulty
+		if((tickIndex % UNICORN_DIFF) === 0){ generateUnicorn(); }
+
+		//handle burger firing: accelerates and destroys burger
 		var i;
 		for(i=0; i<=burgerArray.length-1; i++) {
 			burgerArray[i].x = burgerArray[i].x + BURGER_SPEED;
@@ -240,21 +257,8 @@ function tick(event) {
 				}
 			}
 		}
-
-		//you get points for just surviving as well
-		if(isGCAlive){ points += SURVIVAL_PTS; }
-		scoreText.text = points;
-
-		if((tickIndex % UNICORN_DIFF) === 0){ generateUnicorn(); }
-
-		// need to add lazer!
 		for(i=0; i<=unicornArray.length-1; i++) {
-			var pt = unicornArray[i].localToLocal(0, UNICORN_H / 2,grumpyCat);
-			if(grumpyCat.hitTest(pt.x, pt.y)) {
-				gameover();
-				console.log('hit');
-				break;
-			}
+			if (isHit(unicornArray[i])){gameover();}
 			var k;
 			for(k=0; k<=unicornArray[i].lazerArray.length-1; k++) {
 				var pt2 = unicornArray[i].lazerArray[k].localToLocal(0,0,grumpyCat);
@@ -281,7 +285,7 @@ function tick(event) {
 				}
 			}
 
-			//remove unicorn when off screen
+			//remove unicorn when off screen 
 			if(unicornArray[i].x <= -UNICORN_W) {
 				stage.removeChild(unicornArray[i]);
 				unicornArray[i].lazerArray = [];
